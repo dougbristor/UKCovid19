@@ -3,7 +3,7 @@
 #on:
 #  schedule:
 #    - cron: "0 2,5,9 * * *"
-name: Manual workflow
+name: Manual workflow two
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
