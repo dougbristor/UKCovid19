@@ -3,7 +3,7 @@ name: Update automatically from Public Health England
 on:
   repository_dispatch:
   schedule:
-    - cron: "54 16 * * *"
+    - cron: "17 17 * * *"
 #name: Manual workflow two
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
@@ -57,6 +57,7 @@ jobs:
           git commit -m "Update CSVs for $(date +'%Y-%m-%d') for PHE"
     - name: Push changes
       if: steps.decide_variable.outputs.changed != 0
-      uses: ad-m/github-push-action@main
+      uses: ad-m/github-push-action@master
       with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch:	'main'
