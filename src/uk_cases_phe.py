@@ -288,7 +288,7 @@ if __name__ == "__main__":
     
     
     #print(newmergedata)
-    filename = "combo.tsv"
+    filename = "../data/daily/latest.tsv"
     # save to tsv file
     newmergedata.to_csv(filename, sep="\t", quoting=csv.QUOTE_NONE)    
 
