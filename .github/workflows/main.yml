@@ -47,15 +47,15 @@ jobs:
       run: |-
           #    echo "##[set-output name=changed;]$(git diff --quiet HEAD data/daily/*.tsv; echo $?)"
           echo "::set-output name=change::$(git diff --quiet HEAD data/daily/*.tsv; echo $?)"
-          - name: Commit files
-          if: steps.decide_variable.outputs.changed != 0
-          run: |
-             git config --local user.email "action@github.com"
-             git config --local user.name "GitHub Action"
-             git add data
-             git commit -m "Update CSVs for $(date +'%Y-%m-%d') for PHE"
-          - name: Push changes
-          if: steps.decide_variable.outputs.changed != 0
-          uses: ad-m/github-push-action@master
-          with:
-             github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Commit files
+      if: steps.decide_variable.outputs.changed != 0
+      run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data
+          git commit -m "Update CSVs for $(date +'%Y-%m-%d') for PHE"
+    - name: Push changes
+      if: steps.decide_variable.outputs.changed != 0
+      uses: ad-m/github-push-action@master
+      with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
