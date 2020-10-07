@@ -34,7 +34,22 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: XXX
-
+    - name: Update PHE
       run: |
-        python UK_Cases.py
+          ./scr/uk_cases_phe.py
+    - name: Set variable to check if anything changed
+      id: decide_variable
+      run: |-
+          echo "##[set-output name=changed;]$(git diff --quiet HEAD data/daily/*.tsv; echo $?)"
+          - name: Commit files
+          if: steps.decide_variable.outputs.changed != 0
+          run: |
+             git config --local user.email "action@github.com"
+             git config --local user.name "GitHub Action"
+             git add data
+             git commit -m "Update CSVs for $(date +'%Y-%m-%d') for PHE"
+          - name: Push changes
+          if: steps.decide_variable.outputs.changed != 0
+          uses: ad-m/github-push-action@master
+          with:
+             github_token: ${{ secrets.GITHUB_TOKEN }}
