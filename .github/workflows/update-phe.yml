@@ -1,23 +1,24 @@
-#name: CI
+name: Update automatically from Public Health England
 
-#on:
-#  schedule:
-#    - cron: "0 2,5,9 * * *"
-name: Manual workflow two
+on:
+  repository_dispatch:
+  schedule:
+    - cron: "0 18 * * *"
+#name: Manual workflow two
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
-on:
-  workflow_dispatch:
+#on:
+#  workflow_dispatch:
     # Inputs the workflow accepts.
-    inputs:
-      name:
+#    inputs:
+#      name:
         # Friendly description to be shown in the UI instead of 'name'
-        description: 'Person to greet'
+#        description: 'Person to greet'
         # Default value if no value is explicitly provided
-        default: 'World'
+#        default: 'World'
         # Input has to be provided for the workflow to run
-        required: true
+#        required: true
 
 jobs:
   build:
@@ -56,6 +57,6 @@ jobs:
           git commit -m "Update CSVs for $(date +'%Y-%m-%d') for PHE"
     - name: Push changes
       if: steps.decide_variable.outputs.changed != 0
-      uses: ad-m/github-push-action@master
+      uses: ad-m/github-push-action@main
       with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
