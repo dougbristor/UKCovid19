@@ -58,6 +58,7 @@ jobs:
           git commit -m "Update CSVs for $(date +'%Y-%m-%d') for PHE"
     - name: Push changes
       if: steps.decide_variable.outputs.changed != 0
-      uses: ad-m/github-push-action@main
+      uses: ad-m/github-push-action@master
       with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch:	'main'
