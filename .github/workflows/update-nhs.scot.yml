@@ -1,4 +1,4 @@
-name: Update automatically from Public Health England
+name: Update automatically from Health Scotland
 
 on:
 #  repository_dispatch:
