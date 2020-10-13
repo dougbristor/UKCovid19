@@ -338,7 +338,7 @@ if __name__ == "__main__":
         
         
         print( "Latest Date from data:" ,  max(readtsv['date'])  )
-        print( "Latest Date from file:",  pd.to_datetime(max(maletable['date']) )
+        print( "Latest Date from file:",  pd.to_datetime(max(maletable['date']) ) )
         
         """ check for latest update new data   """
         if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(maletable['date'])) : 
