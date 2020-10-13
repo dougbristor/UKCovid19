@@ -12,6 +12,10 @@ import os.path
 import csv
 
 
+import urllib3
+urllib3.disable_warnings()
+
+
 
 
 """ Pull data from PHE and process data to store case data by age a tsv file  
@@ -188,12 +192,18 @@ def expandages(data, columnname) :
 
 
 # join age groups into bands
-def simpleages(data) : 
+def simpleages(data, infotype , gender) : 
 	
     #date =[  "2020-10-08", "2020-10-09" , '2020-10-10']
     date = [ max(data.loc[ 0: , 'date'])]    
-    newdata =  data[['code', 'date',   'gender']].copy()
-    gender = data.loc[ 0 , 'gender']
+    newdata =  data[['code', 'date']].copy()
+    #gender = data.loc[ 0 , 'gender']
+    #if 'female
+    #infotype if 
+    newdata['type'] = infotype
+    newdata['gender'] = gender
+    
+    
     newdata['0_to_5'] =    data['0_to_4'] + ( data['5_to_9']/5).astype(int)    
     newdata['6_to_17'] =  ( data  ['5_to_9']*4/5).astype(int)  +  data['10_to_14'] +  ( data['15_to_19']*3/5).astype(int)     
     newdata['18_to_64']  =   (data['15_to_19']*2/5).astype(int)  +  data.loc[: ,  ['20_to_24', '25_to_29', '30_to_34', '35_to_39','40_to_44', '45_to_49', '50_to_54', '55_to_59', '60_to_64']].sum(axis=1)
@@ -210,6 +220,7 @@ def simpleages(data) :
         areadf = subdata.loc[index].sum(axis=0).T
         areadf['code'] = "E40000008" 
         areadf['date'] = d
+        areadf['type'] = infotype
         areadf['gender'] = gender
         newdata = newdata.append(areadf , ignore_index=True).rename_axis('index',axis=1).reset_index() 
         newdata.drop(['index'], axis=1, inplace=True)
@@ -219,6 +230,7 @@ def simpleages(data) :
         areadf = subdata.loc[index].sum(axis=0).to_dict()
         areadf['code'] = "E40000009" 
         areadf['date'] = d
+        areadf['type'] = infotype
         areadf['gender'] = gender
         newdata = newdata.append(areadf , ignore_index=True).rename_axis('index',axis=1).reset_index() 
         newdata.drop(['index'], axis=1, inplace=True)
@@ -228,7 +240,7 @@ def simpleages(data) :
         
     # reorder columns
     newdata['date'] = pd.to_datetime(newdata['date'])   
-    col =[ 'code', 'date', 'gender', '0_to_5', '6_to_17', '18_to_64', '65_to_84', '85+' ] 
+    col =[ 'code', 'date', 'type' ,'gender', '0_to_5', '6_to_17', '18_to_64', '65_to_84', '85+' ] 
      
     newdata = newdata[col].sort_values(by=['date']).reset_index().drop(['index'], axis=1)
     newdata.index.name='id'
@@ -288,42 +300,20 @@ if __name__ == "__main__":
     newdata = pd.concat([ pd.json_normalize(get_paginated_dataset( query_filters , query_structure)) , pd.json_normalize( get_paginated_dataset(query_filters1 , query_structure))]   , ignore_index='true' )
     newdata.index.name='id'
     
-    
-    """
-    daily = pd.date_range(start=data['date'].min(), end=data['date'].max(), freq='D')
-    
-#    print(daily)
-    areas = data['code'].unique()
-    
-    newdata = None
-    
-    for area in areas:
-#	    print (area)
-	    
-	    areadf = data.loc[ (data['code'] == area) ].set_index('date')
-	    areadf.index = pd.DatetimeIndex(areadf.index)
-	    
-	    areadf = areadf.reindex(daily, method='ffill')
-	    areadf.index.name='date'
-	    areadf = areadf.fillna(0).reset_index()
-	    
-	    
-	    if newdata is None: 
-    		newdata = areadf
-	    else : 
-    		newdata = newdata.append(areadf, ignore_index=True)
-    print(newdata)
-    """
     admissionAge = pd.json_normalize(get_paginated_dataset( query_filters2 , query_structure2 , {"latestBy": "cumAdmissionsByAge" } ) )
-    col =[ 'code', 'date', 'gender', '0_to_5', '6_to_17', '18_to_64', '65_to_84', '85+' ]  
-    admissionAgeTable = expandages(admissionAge, 'cumAdmissionsByAge' )[col]
     
+
+    col =[ 'code', 'date','type',  'gender', '0_to_5', '6_to_17', '18_to_64', '65_to_84', '85+' ]  
+    admissionAgeTable = expandages(admissionAge, 'cumAdmissionsByAge' )
+    admissionAgeTable['gender'] = 'people'
+    admissionAgeTable['type'] = 'admission'   
+    admissionAgeTable = admissionAgeTable[col]
     
-    
+      
     maletable = expandages(newdata, 'maleCases' )
     femaletable = expandages(newdata, 'femaleCases' )
-    newmale = simpleages(maletable)
-    newfemale = simpleages(femaletable)
+    newmale = simpleages(maletable, 'TotalPositive', 'Male' )
+    newfemale = simpleages(femaletable, 'TotalPositive' , 'Female')
     
     ## write if files don't exist
     if not os.path.isfile(FILEPATH+"maleCases.tsv")  :
@@ -344,9 +334,13 @@ if __name__ == "__main__":
         
         
     else :    
-        readtsv = pd.read_csv(FILEPATH+"maleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE).tail(1)  
+        readtsv = pd.read_csv(FILEPATH+"maleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE).tail(5)  
         
-        """ add new data   """
+        
+        print( "Latest Date from data:" ,  max(readtsv['date'])  )
+        print( "Latest Date from file:",  pd.to_datetime(max(maletable['date']) )
+        
+        """ check for latest update new data   """
         if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(maletable['date'])) : 
              print ("CSV already latest date")
 		
