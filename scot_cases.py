@@ -136,7 +136,7 @@ ages = reorder_ages(ds)
 readtsv = pd.read_csv(FILEPATH+'scot_daily.tsv', sep="\t",  quoting=csv.QUOTE_NONE).tail(5) 
 
 print( "Latest Date from data:" ,  max(readtsv['date'])  )
-print( "Latest Date from file:",  pd.to_datetime(max(ages['date']) )
+print( "Latest Date from file:",  pd.to_datetime(max(ages['date']) ) ) 
 
 if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(ages['date'])) : 
     print ("CSV already latest date")
