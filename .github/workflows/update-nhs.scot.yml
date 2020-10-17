@@ -1,15 +1,16 @@
 name: Update automatically from Health Scotland
 
 on:
-#  repository_dispatch:
-#  schedule:
-#    - cron: "30 17 * * *"
+  repository_dispatch:
+  schedule:
+    - cron: "30 17 * * *"
 #name: Manual workflow two
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 #on:
-  workflow_dispatch:
+"""
+#  workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
       name:
@@ -19,7 +20,7 @@ on:
         default: 'World'
         # Input has to be provided for the workflow to run
         required: true
-
+"""
 jobs:
   build:
 
