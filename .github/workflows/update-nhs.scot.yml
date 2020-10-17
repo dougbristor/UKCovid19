@@ -3,7 +3,7 @@ name: Update automatically from Health Scotland
 on:
   repository_dispatch:
   schedule:
-    - cron: "30 17 * * *"
+    - cron: "40 17 * * *"
 #name: Manual workflow two
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
