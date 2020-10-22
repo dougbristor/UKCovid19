@@ -72,7 +72,7 @@ def get_dataset(url) :
 	col = ['Country', 'Date','Sex' , 'AgeGroup'	,	'TotalPositive',	'TotalDeaths' , 'TotalNegative']
 	
 	
-	
+	readtsv['Country'] = 'S92000003'      
 	
 	
 	readtsv['Date'] = pd.to_datetime(readtsv['Date'], format='%Y%m%d')
