@@ -50,7 +50,31 @@ def get_dataset(url) :
 
     # read local file
 	#readtsv = pd.read_csv("scotin.tsv", sep="\t",  quoting=csv.QUOTE_NONE) 
+	
+	
+	
+	#_id	Date	location_code	location_name	geography	Sex	agegroup	new_positive	total_positive	crude_rate_positive	new_deaths	total_deaths	crude_rate_deaths	total_negative	crude_rate_negative
+
+	
+	
+	newnames = ['location_code' , 'Date' , 'Sex' , 'agegroup' , 'total_positive' , 'total_deaths' , 'total_negative']
+	
+	renames = ['Country', 'Date','Sex' , 'AgeGroup'	,	'TotalPositive',	'TotalDeaths' , 'TotalNegative']
+	
+	
+	
+	for idx, colname in enumerate(newnames) :
+		if colname in readtsv.columns: 
+			readtsv[renames[idx]] = readtsv[colname]
+	
+	
+	
 	col = ['Country', 'Date','Sex' , 'AgeGroup'	,	'TotalPositive',	'TotalDeaths' , 'TotalNegative']
+	
+	
+	
+	
+	
 	readtsv['Date'] = pd.to_datetime(readtsv['Date'], format='%Y%m%d')
 	 
 	readtsv = readtsv[col]
@@ -78,7 +102,11 @@ def reorder_ages(data) :
 		
 		table.drop(rows, axis=0, inplace=True)
 		
-		cols = [ '0 to 4', '5 to 14', '15 to 19', '20 to 24', '25 to 44', '45 to 64',  '65 to 74', '75 to 84', '85plus' ]
+		
+		# 85plus => 85+
+		
+		
+		cols = [ '0 to 4', '5 to 14', '15 to 19', '20 to 24', '25 to 44', '45 to 64',  '65 to 74', '75 to 84', '85+' ]
 		table = table[cols]
 		
 		table['code'] = code
@@ -113,7 +141,7 @@ def  group_ages(data) :
     newdata['6_to_17'] =  ( data  ['5 to 14']*9/10).astype(int)  +  ( data['15 to 19']*3/5).astype(int)     
     newdata['18_to_64']  =   (data['15 to 19']*2/5).astype(int) +  data.loc[: ,  ['20 to 24',  '25 to 44', '45 to 64']].sum(axis=1).astype(int) 
     newdata['65_to_84'] =    data.loc[:, ['65 to 74', '75 to 84'] ].sum(axis=1).astype(int) 
-    newdata['85+'] =   data['85plus']
+    newdata['85+'] =   data['85+']
     
     
     
@@ -136,9 +164,9 @@ ages = reorder_ages(ds)
 readtsv = pd.read_csv(FILEPATH+'scot_daily.tsv', sep="\t",  quoting=csv.QUOTE_NONE).tail(5) 
 
 print( "Latest Date from data:" ,  max(readtsv['date'])  )
-print( "Latest Date from file:",  pd.to_datetime(max(ages['date']) ) ) 
+print( "Latest Date from file:",  pd.to_datetime(max(ages['date']) ) )
 
-if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(ages['date'])) : 
+if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(ages['date'] ) ) : 
     print ("CSV already latest date")
 		
 		
