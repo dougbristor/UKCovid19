@@ -101,11 +101,16 @@ def reorder_ages(data) :
 		rows = ['Date',	'Country'	,'Sex' , 'AgeGroup']
 		
 		table.drop(rows, axis=0, inplace=True)
-		
+
 		
 		# 85plus => 85+
-		
-		
+		newnames = ['85plus']
+		renames = ['85+']
+		for idx, colname in enumerate(newnames) :
+		    if colname in table.columns: 
+		        table[renames[idx]] = table[colname]
+
+	
 		cols = [ '0 to 4', '5 to 14', '15 to 19', '20 to 24', '25 to 44', '45 to 64',  '65 to 74', '75 to 84', '85+' ]
 		table = table[cols]
 		
