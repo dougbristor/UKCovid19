@@ -295,6 +295,23 @@ if __name__ == "__main__":
     newmergedata.index.name='id'
     
     
+    columnnames = newmergedata.columns.tolist()[3:]  #.remove(['date', 	'name'	,'code'])
+    
+    
+    
+    #print(columnnames);
+    
+    
+    newmergedata = newmergedata.fillna(0)
+    
+    
+    
+    for c in columnnames : 
+         newmergedata[c] = newmergedata[c].astype('int64')
+    
+    
+    
+    
     #print(newmergedata)
     filename = "./data/daily/latest.tsv"
     # save to tsv file
