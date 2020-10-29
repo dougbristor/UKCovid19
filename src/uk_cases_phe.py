@@ -183,7 +183,11 @@ if __name__ == "__main__":
         "code": "areaCode",
         "newDeathsByDeathDate": "newDeaths28DaysByDeathDate" ,
         "newCasesBySpecimenDate": "newCasesBySpecimenDate", 
-   			
+
+			
+			
+			
+			
     }
     
     
@@ -195,6 +199,10 @@ if __name__ == "__main__":
         "newAdmissions" : "newAdmissions",
         "covidOccupiedMVBeds" : "covidOccupiedMVBeds", 
         "hospitalCases": "hospitalCases", 
+                "newPillarOneTestsByPublishDate" : "newPillarOneTestsByPublishDate"	,
+        "newPillarTwoTestsByPublishDate": "newPillarTwoTestsByPublishDate",		
+   		"newPillarThreeTestsByPublishDate" : "newPillarThreeTestsByPublishDate"	,
+   		"newPillarFourTestsByPublishDate" : "newPillarFourTestsByPublishDate"	
     }
     
     
