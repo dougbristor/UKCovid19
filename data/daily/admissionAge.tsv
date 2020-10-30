@@ -1,4 +1,4 @@
-id  code	date	type  gender	0_to_5	6_to_17	18_to_64	65_to_84	85+
+code	date	type  	gender	0_to_5	6_to_17	18_to_64	65_to_84	85+
 E40000007	2020-10-07	admission	people	65	47	3002	4521	2765
 E40000003	2020-10-07	admission	people	274	259	10437	8994	3846
 E40000008	2020-10-07	admission	people	94	115	6886	10330	5516
