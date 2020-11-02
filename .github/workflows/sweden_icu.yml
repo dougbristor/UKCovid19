@@ -1,0 +1,61 @@
+name: Manual Update Sweden ICU
+#on:
+#  repository_dispatch:
+#  schedule:
+#    - cron: "50 17 * * *"
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Person to greet'
+        # Default value if no value is explicitly provided
+        default: 'World'
+        # Input has to be provided for the workflow to run
+        required: true
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Update Sweden ICU
+      run: |
+          python ./src/sweden_icu.py
+          
+    - name: List open pull requests
+      run: hub pr list
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Set variable to check if anything changed
+      id: decide_variable
+      run: |-
+          echo "##[set-output name=changed;]$(git diff --quiet HEAD data/daily/sweden_icu.tsv; echo $?)"
+    - name: Commit files
+      if: steps.decide_variable.outputs.changed != 0
+      run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data
+          git commit -m "Update CSVs for $(date +'%Y-%m-%d') from COVID-19 in Swedish intensive care"
+    - name: Push changes
+      if: steps.decide_variable.outputs.changed != 0
+      uses: ad-m/github-push-action@master
+      with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch:	'main'
