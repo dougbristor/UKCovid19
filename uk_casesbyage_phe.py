@@ -316,6 +316,10 @@ if __name__ == "__main__":
     newfemale = simpleages(femaletable, 'TotalPositive' , 'Female')
     
     ## write if files don't exist
+    
+    csv_params_write = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
+
+
     if not os.path.isfile(FILEPATH+"maleCases.tsv")  :
         csv_params = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
 
@@ -350,18 +354,18 @@ if __name__ == "__main__":
              csv_params = dict(sep="\t", mode="a+", header=False, index=False, quoting=csv.QUOTE_NONE) # date_format='%Y-%m-%d'
 
              # raw age cases table by date
-             maletable.to_csv(FILEPATH+"maleCases.tsv", **csv_params)   
-             femaletable.to_csv(FILEPATH+"femaleCases.tsv",  **csv_params)  
+             maletable.to_csv(FILEPATH+"maleCases.tsv", **csv_params_write)   
+             femaletable.to_csv(FILEPATH+"femaleCases.tsv",  **csv_params_write)  
 		
 		     # summary age cases table by date
-             newmale.to_csv(FILEPATH+"SummaryMaleCases.tsv", **csv_params)   
-             newfemale.to_csv(FILEPATH+"SummaryFemaleCases.tsv", **csv_params)  
+             newmale.to_csv(FILEPATH+"SummaryMaleCases.tsv", **csv_params_write)   
+             newfemale.to_csv(FILEPATH+"SummaryFemaleCases.tsv", **csv_params_write)  
              admissionAgeTable.to_csv(FILEPATH+"admissionAge.tsv", **csv_params) 
      
              # merged summary age cases table by date
-             newmale.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)        
-             newfemale.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)     
-             admissionAgeTable.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)  
+             #newmale.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)        
+             #newfemale.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)     
+             #admissionAgeTable.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)  
              print ("Files updated")
                 
         
