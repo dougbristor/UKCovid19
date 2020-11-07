@@ -350,7 +350,21 @@ if __name__ == "__main__":
 		
 		
         else :
-		
+			
+			
+             welshtable = pd.read_csv(FILEPATH+"maleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
+             maletable = pd.concat([maletable,  welshtable[ welshtable[0]=='W92000004' ]])
+             
+             welshtable = pd.read_csv(FILEPATH+"femaleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
+             femaletable = pd.concat([femaletable,  welshtable[ welshtable[0]=='W92000004' ]])
+             
+             
+             welshtable = pd.read_csv(FILEPATH+"SummaryMaleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
+             newmale = pd.concat([newmale,  welshtable[ welshtable[0]=='W92000004'] ])
+             
+             welshtable = pd.read_csv(FILEPATH+"SummaryFemaleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
+             newfemale = pd.concat([newfemale,  welshtable[ welshtable[0]=='W92000004'] ])
+                          
              csv_params = dict(sep="\t", mode="a+", header=False, index=False, quoting=csv.QUOTE_NONE) # date_format='%Y-%m-%d'
 
              # raw age cases table by date
