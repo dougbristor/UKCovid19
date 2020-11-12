@@ -47,7 +47,7 @@ jobs:
     - name: Set variable to check if anything changed
       id: decide_variable
       run: |-
-          echo "##[set-output name=changed;]$(git diff --quiet HEAD data/daily/cases_latest.tsv; echo $?)"
+          echo "##[set-output name=changed;]$(git diff --quiet HEAD data/daily/admissionAge.tsv; echo $?)"
           #echo "::set-output name=change::$(git diff --quiet HEAD data/daily/*.tsv; echo $?)"
     - name: Commit files
       if: steps.decide_variable.outputs.changed != 0
