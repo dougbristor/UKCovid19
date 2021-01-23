@@ -288,11 +288,11 @@ if __name__ == "__main__":
 	    if newmergedata is None: 
     		newmergedata = areadf
 	    else : 
-    		newmergedata = newmergedata.append(areadf, ignore_index=True)	    
+    		newmergedata = newmergedata.append(areadf, ignore_index=True )	    
 	
 	
 	# add column name to index
-    newmergedata.index.name='id'
+    #newmergedata.index.name='id'
     
     
     columnnames = newmergedata.columns.tolist()[3:]  #.remove(['date', 	'name'	,'code'])
@@ -310,13 +310,13 @@ if __name__ == "__main__":
          newmergedata[c] = newmergedata[c].astype('int64')
     
     
-    
+    newmergedata.sort_values(by=['date','code'], inplace = True,  ignore_index=True)
     
     #print(newmergedata)
     filename = "./data/daily/latest.tsv"
     # save to tsv file
-    newmergedata.to_csv(filename, sep="\t", quoting=csv.QUOTE_NONE)    
+    newmergedata.to_csv(filename, sep="\t", quoting=csv.QUOTE_NONE, index=False)    
 
     print ("created TSV file '"+filename+"' \nDate range "+ min(newmergedata['date']).strftime('%B %d, %Y') +" to "+ max(newmergedata['date']).strftime('%B %d, %Y') +"\ntable size", newmergedata.shape )  
      
-	 
+	
