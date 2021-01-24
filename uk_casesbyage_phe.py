@@ -277,11 +277,11 @@ def simpleages(data, infotype , gender) :
     newdata['gender'] = gender
     
     
-    newdata['0_to_5'] =    data['0_to_4'] + ( data['5_to_9']/5).astype(int)    
-    newdata['6_to_17'] =  ( data  ['5_to_9']*4/5).astype(int)  +  data['10_to_14'] +  ( data['15_to_19']*3/5).astype(int)     
-    newdata['18_to_64']  =   (data['15_to_19']*2/5).astype(int)  +  data.loc[: ,  ['20_to_24', '25_to_29', '30_to_34', '35_to_39','40_to_44', '45_to_49', '50_to_54', '55_to_59', '60_to_64']].sum(axis=1)
-    newdata['65_to_84'] =    data.loc[: ,  ['65_to_69', '70_to_74', '75_to_79', '80_to_84'] ].sum(axis=1)
-    newdata['85+'] =   data.loc[: ,  ['85_to_89','90+'] ].sum(axis=1)
+    newdata['0_to_5'] =    data['0_to_4'] + ( data['5_to_9']/5).astype('int64')  
+    newdata['6_to_17'] =  ( data  ['5_to_9']*4/5).astype(int)  +  data['10_to_14'] +  ( data['15_to_19']*3/5).astype('int64')  
+    newdata['18_to_64']  =   (data['15_to_19']*2/5).astype(int)  +  data.loc[: ,  ['20_to_24', '25_to_29', '30_to_34', '35_to_39','40_to_44', '45_to_49', '50_to_54', '55_to_59', '60_to_64']].sum(axis=1).astype('int64')
+    newdata['65_to_84'] =    data.loc[: ,  ['65_to_69', '70_to_74', '75_to_79', '80_to_84'] ].sum(axis=1).astype('int64')
+    newdata['85+'] =   data.loc[: ,  ['85_to_89','90+'] ].sum(axis=1).astype('int64')
     
     # reduce areas to NHS regions
     for d in date :
@@ -506,23 +506,30 @@ if __name__ == "__main__":
     femaletable = pd.concat([femaletable,  oldtable[ ( (oldtable['code']=='W92000004') & (oldtable['date'] < welshdate) ) | ( oldtable['date'] < lastmonths )  ]  ] )
       
       
-    maletable.sort_values(by=['date','code'], inplace = True,  ignore_index=True)
-    femaletable.sort_values(by=['date','code'], inplace = True,  ignore_index=True)
+    maletable.sort_values(by=['date','code', '0_to_4'], inplace = True,  ignore_index=True)
+    femaletable.sort_values(by=['date','code','0_to_4'], inplace = True,  ignore_index=True)
     
     newfemale = simpleages(femaletable, 'TotalPositive' , 'Female') 
     newmale = simpleages(maletable, 'TotalPositive', 'Male' )   
     
     
+    newfemale.sort_values(by=['date','code', '0_to_5'], inplace = True,  ignore_index=True)
+    newmale.sort_values(by=['date','code', '0_to_5'], inplace = True,  ignore_index=True)
+    
+    
+    
+    
+    
 
+    print(maletable)
     
-    
-    csv_params_write = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
+    #csv_params_write = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
 
 
     if not os.path.isfile(FILEPATH+"maleCases.tsv")  :
 		
 		
-        csv_params = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
+        #csv_params = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
         
         """
 
@@ -570,6 +577,9 @@ if __name__ == "__main__":
              welshtable = pd.read_csv(FILEPATH+"SummaryFemaleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
              newfemale = pd.concat([newfemale,  welshtable[ welshtable['code']=='W92000004'] ])
 			 """                          
+             
+             
+             
              csv_params_write = dict(sep="\t", mode="w", index=False, quoting=csv.QUOTE_NONE) # date_format='%Y-%m-%d'
 	
              # raw age cases table by date
