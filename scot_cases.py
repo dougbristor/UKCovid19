@@ -110,8 +110,11 @@ def reorder_ages(data) :
 		    if colname in table.columns: 
 		        table[renames[idx]] = table[colname]
 
-	
-		cols = [ '0 to 4', '5 to 14', '15 to 19', '20 to 24', '25 to 44', '45 to 64',  '65 to 74', '75 to 84', '85+' ]
+		cols = ['0 to 14', '0 to 59', '15 to 19', '20 to 24', '25 to 44', '45 to 64', '60+', '65 to 74', '75 to 84', '85+' ]
+
+
+
+		#cols = [ '0 to 4', '5 to 14', '15 to 19', '20 to 24', '25 to 44', '45 to 64',  '65 to 74', '75 to 84', '85+' ]
 		table = table[cols]
 		
 		table['code'] = code
@@ -165,29 +168,44 @@ ds = get_dataset(url)
 ages = reorder_ages(ds)
 
 
+if os.path.isfile(FILEPATH+"scot_daily_v2.tsv")  : 
+
 ## ckeck date of last entry  
-readtsv = pd.read_csv(FILEPATH+'scot_daily.tsv', sep="\t",  quoting=csv.QUOTE_NONE).tail(5) 
+	readtsv = pd.read_csv(FILEPATH+'scot_daily_v2.tsv', sep="\t",  quoting=csv.QUOTE_NONE).tail(5) 
 
-print( "Latest Date from data:" ,  max(readtsv['date'])  )
-print( "Latest Date from file:",  pd.to_datetime(max(ages['date']) ) )
+	print( "Latest Date from data:" ,  max(readtsv['date'])  )
+	print( "Latest Date from file:",  pd.to_datetime(max(ages['date']) ) )
 
-if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(ages['date'] ) ) : 
-    print ("CSV already latest date")
+	if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(ages['date'] ) ) : 
+		print ("CSV already latest date")
+		exit(0)
 		
-		
-else :
-    csv_params = dict(sep="\t", mode="a+",   header=False, index=False, quoting=csv.QUOTE_NONE) # date_format='%Y-%m-%d' 
-    ages.to_csv(FILEPATH+'scot_daily.tsv', **csv_params) 
 
-    groupages = group_ages(ages) 
+	
+	
+if not os.path.isfile(FILEPATH+"scot_daily_v2.tsv")  :
+	csv_params = dict(sep="\t", mode="w", index=False, quoting=csv.QUOTE_NONE) 
+
+else:
+	csv_params = dict(sep="\t", mode="a+",   header=False, index=False, quoting=csv.QUOTE_NONE) # date_format='%Y-%m-%d' 
+
+
+
+ages.to_csv(FILEPATH+'scot_daily_v2.tsv', **csv_params) 
+
+#groupages = group_ages(ages) 
+
+
+#groupages.sort_values(by=['date','code', '0_to_5'], inplace = True,  ignore_index=True)
+
+
 #print(ages)
 
 
 
 #print(groupages)
 
-    groupages.to_csv(FILEPATH+'scot_group_ages.tsv', **csv_params) 
+#groupages.to_csv(FILEPATH+'scot_group_ages.tsv', **csv_params) 
 
-    groupages.to_csv(FILEPATH+'cases_latest.tsv', **csv_params) 
-    print ("Files updated")
-
+#groupages.to_csv(FILEPATH+'cases_latest.tsv', **csv_params) 
+print ("Files updated")
