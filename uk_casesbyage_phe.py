@@ -16,6 +16,8 @@ import urllib3
 urllib3.disable_warnings()
 
 
+from datetime import date  
+import datetime
 
 
 """ Pull data from PHE and process data to store case data by age a tsv file  
@@ -161,12 +163,15 @@ def get_paginated_dataset(filters: FiltersType, structure: StructureType,  lates
 
 
 
-
+"""
 # expands ages in json string to columns
+
+
 def expandages(data, columnname) :    
     
     table = None
     idx = 0
+    
     for m in data[columnname]:
        
         df = pd.json_normalize(m )[ ['age','value'] ] 
@@ -181,12 +186,80 @@ def expandages(data, columnname) :
     table['gender'] = columnname;
     
     cols = list(table.columns)
+    
+    
     cols = cols[-3:] + cols[:-3]
     table = table[cols]
     table = table.rename_axis('index',axis=1).reset_index() 
     table.drop(['index', 'level_0'], axis=1, inplace=True)
     
     return table
+
+"""
+
+
+
+def expandages(df, columnname) :    
+    
+    table = None
+    #idx = 0
+    #df = data[columnname] 
+    
+    #[ ['age','value'] ] 
+    #row = df.iloc[0]
+    
+    #print(row)
+    #ages = pd.json_normalize(row)[['age', 'value']  ]
+    #print(ages)
+    
+    #print(pd.pivot_table(ages,  columns = 'age') )  
+    #row = pd.pivot_table(pd.json_normalize(df.iloc[0])[['age', 'value']] ,  columns = 'age')
+    #print(row )
+     
+    #exit(0)
+    #df = pd.json_normalize(data[columnname] ) 
+    #print(df)
+    
+
+    for index, row in df.iterrows():
+        #print(row)
+       
+        #print(row[columnname])
+        newrow = pd.pivot_table(pd.json_normalize(row[columnname] )[['age', 'value']] ,  columns = 'age')
+        #print(m.iloc[i ] )
+        newrow['code'] = row['code' ]
+        newrow['date'] = row['date' ]
+       
+        if table is None:
+              table = newrow # pd.pivot_table(df,  columns = 'age') 
+              
+                
+        else :
+              table = table.append(newrow) # pd.pivot_table(df,  columns = 'age') ) 
+        
+    table = table.rename_axis('index',axis=1).reset_index() 
+    #table[['code' ,'date'] ] = data[[ 'code','date']]
+    table['gender'] = columnname;
+    
+    cols = list(table.columns)
+    
+    
+    cols = cols[-3:] + cols[:-3]
+    table = table[cols]
+    table = table.rename_axis('index',axis=1).reset_index() 
+    table.drop(['index', 'level_0'], axis=1, inplace=True)
+    
+    
+    #print(table)
+    #exit(0)
+    return table
+
+
+
+
+
+
+
 
 
 
@@ -264,8 +337,9 @@ if __name__ == "__main__":
     #    f"date=2020-07-20",
     ]
     query_filters2 = [
-        f"areaType=nhsRegion",   
-     #   f"date=2020-07-20",
+        f"areaType=nhsRegion", 
+          
+        f"date=2020-12-20",
     ]
 
 
@@ -297,31 +371,160 @@ if __name__ == "__main__":
         }
     
 
-    newdata = pd.concat([ pd.json_normalize(get_paginated_dataset( query_filters , query_structure)) , pd.json_normalize( get_paginated_dataset(query_filters1 , query_structure))]   , ignore_index='true' )
-    newdata.index.name='id'
+      
     
-    admissionAge = pd.json_normalize(get_paginated_dataset( query_filters2 , query_structure2 , {"latestBy": "cumAdmissionsByAge" } ) )
+
+    
+    getdate = (date.today()  -  datetime.timedelta(days = 14 )).strftime('%Y-%m-%d')
+    query_filters2 = [
+		f"areaType=nhsRegion" #, 
+        #	f"date=" + getdate ,
+		]  
+		
+		
+	
+	
+	
+		
+    query_filters1 = [
+        f"areaType=nation", 
+        f"date=" + getdate ,
+    ]
+    
+    
+    query_filters1 = [
+        f"areaType=nation", 
+    #    f"date=2020-07-20",
+    ]    
+    
+    	  
+    admissionAge = pd.json_normalize(get_paginated_dataset( query_filters2 , query_structure2 , {"latestBy": None} )) #"cumAdmissionsByAge" } ) )
+    
+    """
+    for i in  range(13 , 0 , -1) : 
+	    
+	    getdate = (date.today()  -  datetime.timedelta(days = i )).strftime('%Y-%m-%d')
+	    #edate = (datetime.strptime(sdate, '%Y%m%d' ) + timedelta(days=20*7) ).strftime('%Y%m%d')
+	    
+	    #print(getdate.strftime('%Y-%m-%d') )
+	    
+	    
+    
+	    query_filters2 = [
+			f"areaType=nhsRegion", 
+			f"date=" + getdate ,
+	    ]
+    
+		#admissionAge1 = pd.json_normalize(get_paginated_dataset( query_filters2 , query_structure2 , {"latestBy": None} )) #"cumAdmissionsByAge" } ) )
+	    admissionAge = pd.concat( [admissionAge, pd.json_normalize(get_paginated_dataset( query_filters2 , query_structure2 , {"latestBy": None} )) ] , ignore_index='true' )
+
+
+    #admissionAge = pd.concat([ admissionAge , pd.json_normalize( query_filters2 , query_structure2 , {"latestBy": None} ) ]   , ignore_index='true' )
+
+    #admissionAge = pd.json_normalize(get_paginated_dataset( query_filters2 , query_structure2 , {"latestBy": None} )) #"cumAdmissionsByAge" } ) )
+    
+    """
+    #print (admissionAge , admissionAge.shape )
+    
+    newdata = pd.concat([ pd.json_normalize(get_paginated_dataset( query_filters , query_structure)) , pd.json_normalize( get_paginated_dataset(query_filters1 , query_structure))]   , ignore_index='true' )
+    #newdata.index.name='id'
+    
+    print (newdata , newdata.shape )
+    
+    
+    print(newdata[newdata['name'] == 'Wales'] ) 
+    
+    
+    
+    welshdate = newdata.loc[ newdata['code']=='W92000004' ]['date'].values[0]
+    
+    wd = datetime.datetime.strptime(welshdate, "%Y-%m-%d") 
+   
+    lastmonths = ( wd -  datetime.timedelta(days = 7*12 )).strftime('%Y-%m-%d')   #date.today()
+    
+    print(welshdate , lastmonths )
+    
+    
+  
+    
+        #print( wd )
+    
+    ##exit(0) 
+    
+    
     
 
     col =[ 'code', 'date','type',  'gender', '0_to_5', '6_to_17', '18_to_64', '65_to_84', '85+' ]  
-    admissionAgeTable = expandages(admissionAge, 'cumAdmissionsByAge' )
+    
+    
+   # intcol = [0_to_4	10_to_14	15_to_19	20_to_24	25_to_29	30_to_34	35_to_39	40_to_44	45_to_49	50_to_54	55_to_59	5_to_9	60_to_64	65_to_69	70_to_74	75_to_79	80_to_84	85_to_89	90+]
+
+    
+    
+    #intcolsum = [0_to_5	6_to_17	18_to_64	65_to_84	85+]
+    
+    
+    
+    #print(admissionAge['date'])
+    
+    admissionAge['date'] = pd.to_datetime(admissionAge["date"] , format='%Y-%m-%d')    #pd.to_datetime(admissionAge["date"].dt.strftime('%Y-%m-%d'))
+    newdata['date'] = pd.to_datetime(newdata["date"] , format='%Y-%m-%d') 
+    
+     
+    newdata = newdata[newdata['date'] >= lastmonths] 
+    
+
+
+    admissionAge = admissionAge[admissionAge['date'] >= lastmonths]    
+    admissionAgeTable = expandages(admissionAge, 'cumAdmissionsByAge'  )
     admissionAgeTable['gender'] = 'people'
     admissionAgeTable['type'] = 'admission'   
-    admissionAgeTable = admissionAgeTable[col]
+    admissionAgeTable = admissionAgeTable[col]    
+        
+    oldtable = pd.read_csv(FILEPATH+"admissionAge.tsv", sep="\t",  quoting=csv.QUOTE_NONE,  index_col=False)
+    oldtable['date'] = pd.to_datetime(oldtable["date"] , format='%Y-%m-%d')       
+    oldtable = oldtable[ oldtable['date'] < lastmonths ]
+
+    admissionAgeTable = pd.concat( [  oldtable  , admissionAgeTable  ] )
+    admissionAgeTable.sort_values(by=['date','code'], inplace = True,  ignore_index=True)
     
-      
-    maletable = expandages(newdata, 'maleCases' )
+
+
+     
+    maletable = expandages(newdata, 'maleCases' )   
     femaletable = expandages(newdata, 'femaleCases' )
-    newmale = simpleages(maletable, 'TotalPositive', 'Male' )
-    newfemale = simpleages(femaletable, 'TotalPositive' , 'Female')
+  
     
-    ## write if files don't exist
+    oldtable = pd.read_csv(FILEPATH+"maleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE,  index_col=False)
+    oldtable['date'] = pd.to_datetime(oldtable["date"] , format='%Y-%m-%d') 
+    
+    maletable = pd.concat( [maletable, oldtable[  ( ( oldtable['code']=='W92000004') & (oldtable['date'] < welshdate))  | ( oldtable['date'] < lastmonths  ) ]  ])
+             
+    oldtable = pd.read_csv(FILEPATH+"femaleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE,  index_col=False)
+    oldtable['date'] = pd.to_datetime(oldtable["date"] , format='%Y-%m-%d') 
+    
+    femaletable = pd.concat([femaletable,  oldtable[ ( (oldtable['code']=='W92000004') & (oldtable['date'] < welshdate) ) | ( oldtable['date'] < lastmonths )  ]  ] )
+      
+      
+    maletable.sort_values(by=['date','code'], inplace = True,  ignore_index=True)
+    femaletable.sort_values(by=['date','code'], inplace = True,  ignore_index=True)
+    
+    newfemale = simpleages(femaletable, 'TotalPositive' , 'Female') 
+    newmale = simpleages(maletable, 'TotalPositive', 'Male' )   
+    
+    
+
+    
     
     csv_params_write = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
 
 
     if not os.path.isfile(FILEPATH+"maleCases.tsv")  :
+		
+		
         csv_params = dict(sep="\t", index=False, quoting=csv.QUOTE_NONE )
+        
+        """
 
         maletable.to_csv(FILEPATH+"maleCases.tsv", sep="\t",**csv_params)   
         femaletable.to_csv(FILEPATH+"femaleCases.tsv", **csv_params) 
@@ -334,28 +537,30 @@ if __name__ == "__main__":
         newmale.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)        
         newfemale.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)     
         admissionAgeTable.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)      
-        
+        """
         
         
     else :    
-        readtsv = pd.read_csv(FILEPATH+"maleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE).tail(5)  
+        #readtsv = pd.read_csv(FILEPATH+"admissionAge.tsv", sep="\t",  quoting=csv.QUOTE_NONE).tail(5)  
         
         
-        print( "Latest Date from data:" ,  max(readtsv['date'])  )
-        print( "Latest Date from file:",  pd.to_datetime(max(maletable['date']) ) )
+        #print( "Latest Date from data:" ,  max(readtsv['date'])  )
+        #print( "Latest Date from file:",  pd.to_datetime(max(maletable['date']) ) )
         
         """ check for latest update new data   """
-        if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(maletable['date'])) : 
-             print ("CSV already latest date")
+        #if pd.to_datetime(max(readtsv['date'])) ==  pd.to_datetime(max(maletable['date'])) : 
+        #     print ("CSV already latest date")
 		
-		
-        else :
+        if 1==1: 
+        #else :
 			
-			
+			 
+             """
              welshtable = pd.read_csv(FILEPATH+"maleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
              maletable = pd.concat([maletable,  welshtable[ welshtable['code']=='W92000004' ]])
              
              welshtable = pd.read_csv(FILEPATH+"femaleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
+        
              femaletable = pd.concat([femaletable,  welshtable[ welshtable['code']=='W92000004' ]])
              
              
@@ -364,17 +569,21 @@ if __name__ == "__main__":
              
              welshtable = pd.read_csv(FILEPATH+"SummaryFemaleCases.tsv", sep="\t",  quoting=csv.QUOTE_NONE)
              newfemale = pd.concat([newfemale,  welshtable[ welshtable['code']=='W92000004'] ])
-                          
-             csv_params = dict(sep="\t", mode="a+", header=False, index=False, quoting=csv.QUOTE_NONE) # date_format='%Y-%m-%d'
-
+			 """                          
+             csv_params_write = dict(sep="\t", mode="w", index=False, quoting=csv.QUOTE_NONE) # date_format='%Y-%m-%d'
+	
              # raw age cases table by date
              maletable.to_csv(FILEPATH+"maleCases.tsv", **csv_params_write)   
              femaletable.to_csv(FILEPATH+"femaleCases.tsv",  **csv_params_write)  
 		
 		     # summary age cases table by date
              newmale.to_csv(FILEPATH+"SummaryMaleCases.tsv", **csv_params_write)   
-             newfemale.to_csv(FILEPATH+"SummaryFemaleCases.tsv", **csv_params_write)  
-             admissionAgeTable.to_csv(FILEPATH+"admissionAge.tsv", **csv_params) 
+             newfemale.to_csv(FILEPATH+"SummaryFemaleCases.tsv", **csv_params_write)     
+             #"""
+             
+             #csv_params = dict(sep="\t", mode="w+", header=False, index=False, quoting=csv.QUOTE_NONE)
+             #csv_params = dict(sep="\t", mode="w", header=False, index=False, quoting=csv.QUOTE_NONE)
+             admissionAgeTable.to_csv(FILEPATH+"admissionAge.tsv", **csv_params_write) 
      
              # merged summary age cases table by date
              #newmale.to_csv(FILEPATH+"cases_latest.tsv", **csv_params)        
