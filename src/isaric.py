@@ -2,7 +2,6 @@
 # Age, sex and status at 28 days after admission
 # Dynamic ISARIC4C / CO-CIN report to SAGE and NERVTAG
 
-download and store UK hospital figures
 import requests
 
 import lxml.html
