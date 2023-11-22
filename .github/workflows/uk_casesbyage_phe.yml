@@ -1,16 +1,16 @@
 name: Update automatically from UK Cases by Age and Gender.py
 
-on:
-  repository_dispatch:
-  schedule:
-    - cron: "50 18 * * *"
+#on:
+#  repository_dispatch:
+#  schedule:
+#   - cron: "50 18 * * *"
 #name: Manual workflow two
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 
-#on:
-#  workflow_dispatch:
+on:
+  workflow_dispatch:
     # Inputs the workflow accepts.
 #    inputs:
 #      name:
