@@ -1,14 +1,14 @@
 name: Auto Update Sweden ICU
 on:
-  repository_dispatch:
-  schedule:
-    - cron: "40 09 * * *"
+#  repository_dispatch:
+#  schedule:
+#    - cron: "40 09 * * *"
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 
-#on:
-#  workflow_dispatch:
+on:
+  workflow_dispatch:
     # Inputs the workflow accepts.
 #    inputs:
 #      name:
