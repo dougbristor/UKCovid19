@@ -1,5 +1,5 @@
 name: Auto Update Sweden ICU
-on:
+#on:
 #  repository_dispatch:
 #  schedule:
 #    - cron: "40 09 * * *"
